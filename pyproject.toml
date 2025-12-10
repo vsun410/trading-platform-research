@@ -1,0 +1,109 @@
+[project]
+name = "trading-platform-research"
+version = "0.1.0"
+description = "알고리즘 트레이딩 플랫폼 - 백테스트 및 전략 연구"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [
+    {name = "vsun410"}
+]
+
+dependencies = [
+    # 데이터 처리
+    "pandas>=2.0.0",
+    "numpy>=1.24.0",
+    "polars>=0.20.0",
+    
+    # 시계열 분석
+    "ta>=0.11.0",           # Technical Analysis
+    "ta-lib>=0.4.0",        # TA-Lib 래퍼 (선택)
+    
+    # 백테스팅
+    "vectorbt>=0.26.0",     # 벡터화 백테스트
+    
+    # ML/DL
+    "scikit-learn>=1.3.0",
+    "xgboost>=2.0.0",
+    "lightgbm>=4.0.0",
+    "optuna>=3.4.0",        # 하이퍼파라미터 최적화
+    
+    # 딥러닝 (선택)
+    "torch>=2.0.0",
+    
+    # 강화학습 (선택)
+    "stable-baselines3>=2.0.0",
+    "gymnasium>=0.29.0",
+    
+    # 시각화
+    "matplotlib>=3.7.0",
+    "seaborn>=0.13.0",
+    "plotly>=5.18.0",
+    
+    # 유틸리티
+    "python-dotenv>=1.0.0",
+    "pydantic>=2.5.0",
+    "pydantic-settings>=2.1.0",
+    "loguru>=0.7.0",
+    "tqdm>=4.66.0",
+    "pyarrow>=14.0.0",      # Parquet 지원
+    
+    # 거래소 API
+    "ccxt>=4.1.0",
+    "pyupbit>=0.2.0",
+    
+    # 데이터베이스
+    "sqlalchemy>=2.0.0",
+    "psycopg2-binary>=2.9.0",
+    "redis>=5.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "pytest-asyncio>=0.21.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+    "mypy>=1.7.0",
+    "pre-commit>=3.6.0",
+    "ipykernel>=6.27.0",
+    "jupyterlab>=4.0.0",
+]
+
+notebook = [
+    "jupyterlab>=4.0.0",
+    "ipywidgets>=8.1.0",
+    "jupyter-dash>=0.4.0",
+]
+
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
+
+[tool.black]
+line-length = 88
+target-version = ["py311"]
+include = '\.pyi?$'
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+select = ["E", "F", "I", "N", "W", "B", "C4", "UP"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_ignores = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-v --cov=src --cov-report=term-missing"
+asyncio_mode = "auto"
