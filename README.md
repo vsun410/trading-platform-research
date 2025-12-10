@@ -1,126 +1,106 @@
-# Trading Platform Research
+# Trading Platform - Research
 
-🔬 백테스트 엔진, 전략 연구, ML 모델 개발
+전략 연구 & 백테스트 환경
 
-## 📁 프로젝트 구조
+## 🎯 목적
+
+다양한 트레이딩 전략을 연구하고 백테스트하는 프로젝트입니다.
+
+## 📊 전략 로드맵
+
+| Phase | 전략 | 상태 | 설명 |
+|:---:|:---|:---:|:---|
+| 1 | 김프 차익거래 | 🔴 진행중 | 업비트 현물 ↔ 바이낸스 선물 |
+| 2 | 추세 추종 | ⚪ 예정 | MA, Breakout |
+| 3 | 평균 회귀 | ⚪ 예정 | Bollinger, RSI |
+| 4 | 머신러닝 | ⚪ 예정 | 예측 모델 |
+
+## 🏗️ 프로젝트 구조
 
 ```
-research/
+trading-platform-research/
+├── README.md
+├── pyproject.toml
+├── .gitignore
+├── docs/
+│   ├── STRATEGY_GUIDE.md      # 전략 개발 가이드
+│   ├── BACKTEST_GUIDE.md      # 백테스트 실행 가이드
+│   └── DATA_SPEC.md           # 데이터 명세
 ├── src/
-│   ├── strategies/        # 트레이딩 전략
-│   │   ├── base.py       # 전략 베이스 클래스
-│   │   ├── kimchi/       # 김치프리미엄 전략
-│   │   └── arbitrage/    # 차익거래 전략
-│   ├── backtesting/      # 백테스트 엔진
-│   │   ├── engine.py     # 백테스트 실행기
-│   │   ├── metrics.py    # 성과 지표
-│   │   └── report.py     # 리포트 생성
-│   ├── data/             # 데이터 처리
-│   │   ├── loaders.py    # 데이터 로더
-│   │   ├── processors.py # 전처리
-│   │   └── features.py   # 피처 엔지니어링
-│   ├── models/           # ML 모델
-│   │   ├── lstm/         # LSTM 모델
-│   │   ├── xgboost/      # XGBoost
-│   │   └── rl/           # 강화학습
-│   └── utils/            # 유틸리티
-├── notebooks/            # Jupyter 노트북
-│   ├── exploration/      # 데이터 탐색
-│   ├── experiments/      # 실험
-│   └── reports/          # 분석 리포트
-├── tests/                # 테스트
-├── configs/              # 설정 파일
-└── data/                 # 데이터 (gitignore)
-    ├── raw/
-    ├── processed/
-    └── cache/
+│   ├── strategies/            # 전략 구현
+│   │   ├── __init__.py
+│   │   ├── base.py            # 전략 베이스 클래스
+│   │   └── kimp/              # 김프 전략
+│   │       ├── __init__.py
+│   │       └── cash_carry.py
+│   ├── backtest/              # 백테스트 엔진
+│   │   ├── __init__.py
+│   │   ├── engine.py
+│   │   └── metrics.py
+│   ├── data/                  # 데이터 로더
+│   │   ├── __init__.py
+│   │   ├── fetcher.py
+│   │   └── preprocessor.py
+│   └── utils/                 # 유틸리티
+│       ├── __init__.py
+│       └── logger.py
+├── notebooks/                 # 연구 노트북
+│   └── 01_kimp_analysis.ipynb
+└── tests/                     # 테스트
+    └── test_strategies.py
 ```
 
 ## 🚀 빠른 시작
 
-### 1. 환경 설정
-
 ```bash
-# 저장소 클론
+# 1. 클론
 git clone https://github.com/vsun410/trading-platform-research.git
 cd trading-platform-research
 
-# 가상환경 생성
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+# 2. 환경 설정 (Python 패키지 매니저 선택 후)
+# pip
+pip install -e .
 
-# 의존성 설치
-pip install -e ".[dev]"
+# 또는 poetry
+poetry install
+
+# 3. 노트북 실행
+jupyter lab notebooks/
 ```
 
-### 2. 백테스트 실행
+## 📈 Phase 1: 김프 차익거래
 
-```python
-from src.backtesting import BacktestEngine
-from src.strategies.kimchi import KimchiPremiumStrategy
+### 전략 개요
 
-# 전략 초기화
-strategy = KimchiPremiumStrategy(
-    entry_threshold=4.0,  # 진입: 김프 > 4%
-    exit_threshold=2.0,   # 청산: 김프 < 2%
-)
-
-# 백테스트 실행
-engine = BacktestEngine(
-    strategy=strategy,
-    start_date="2024-01-01",
-    end_date="2024-12-01",
-    initial_capital=100_000_000,  # 1억원
-)
-
-results = engine.run()
-engine.generate_report()
-```
-
-### 3. Jupyter 노트북
-
-```bash
-# Jupyter 실행
-jupyter lab
-
-# 또는 Docker로 실행
-docker-compose -f ../infra/docker-compose.yml --profile research up
-# → http://localhost:8888
-```
-
-## ⚠️ 주의사항: Look-ahead Bias 방지
-
-```python
-# ❌ 잘못된 예: 미래 데이터 사용
-df['signal'] = df['future_price'] > df['current_price']
-
-# ✅ 올바른 예: 과거 데이터만 사용
-df['signal'] = df['price'].shift(1) > df['ma_20'].shift(1)
-```
-
-**체크리스트:**
-- [ ] 모든 피처는 shift() 적용 확인
-- [ ] 테스트셋은 학습에 절대 사용 안 함
-- [ ] Walk-forward 분석으로 검증
-
-## 📊 성과 지표
-
-| 지표 | 목표 | 설명 |
-|:---|:---|:---|
-| Sharpe Ratio | > 1.5 | 위험 대비 수익 |
-| Calmar Ratio | > 2.0 | MDD 대비 수익 |
-| Max Drawdown | < 15% | 최대 손실폭 |
-| Win Rate | > 60% | 승률 |
-| Profit Factor | > 1.5 | 총이익/총손실 |
-
-## 🔗 관련 레포지토리
-
-| 레포 | 설명 |
+| 항목 | 값 |
 |:---|:---|
-| [docs](https://github.com/vsun410/trading-platform-docs) | 아키텍처 문서 |
-| [execution](https://github.com/vsun410/trading-platform-execution) | 실거래 엔진 (Private) |
-| [infra](https://github.com/vsun410/trading-platform-infra) | 인프라, Docker |
+| 롱 포지션 | 업비트 BTC 현물 매수 |
+| 숏 포지션 | 바이낸스 BTCUSDT 무기한 선물 매도 |
+| 수익원 | 김프(프리미엄) + 펀딩비 |
+| 리스크 | 역프, 펀딩비 역전, 거래소 리스크 |
 
-## 📝 라이선스
+### 데이터 요구사항
 
-MIT License
+- **해상도**: 1분봉 (최소)
+- **기간**: 2년 (최대)
+- **거래소**: 업비트, 바이낸스
+- **데이터**: OHLCV, 김프율, 펀딩비
+
+## 🔗 관련 레포
+
+| 레포 | 역할 |
+|:---|:---|
+| [trading-platform-portfolio](https://github.com/vsun410/trading-platform-portfolio) | 포트폴리오 검증 |
+| [trading-platform-order](https://github.com/vsun410/trading-platform-order) | 주문 실행 |
+| [trading-platform-storage](https://github.com/vsun410/trading-platform-storage) | 데이터 저장소 |
+
+## 📝 문서
+
+- [전략 개발 가이드](docs/STRATEGY_GUIDE.md)
+- [백테스트 가이드](docs/BACKTEST_GUIDE.md)
+- [데이터 명세](docs/DATA_SPEC.md)
+
+## 📅 마일스톤
+
+- **2개월 목표**: 김프 차익거래 MVP 완성
+- 기능 구현 우선 → 세부 최적화
